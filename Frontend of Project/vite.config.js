@@ -10,16 +10,17 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
-  server: {
-    proxy: {
-      // Catches any request starting with /api
-      '/api/v1': {
-        target: 'http://localhost:8000', // Points to your backend
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
+  base:"https://video-hub-project-full-stack.onrender.com/",
+  // server: {
+  //   proxy: {
+  //     // Catches any request starting with /api
+  //     '/api/v1': {
+  //       target: 'http://localhost:8000', // Points to your backend
+  //       changeOrigin: true,
+  //       secure: false,
+  //     },
+  //   },
+  // },
 
   plugins: [react(),
   tailwindcss(),
