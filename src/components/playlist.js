@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const server = "/api/v1/playlists/"
+const server = `${import.meta.env.VITE_API_BASE_URL}/playlists/`
 class PlaylistService {
     async fetchPlaylists() {
         try {

@@ -2,7 +2,8 @@ import axios from "axios"
 import Error from "../pages/Error";
 
 
-const server = "/api/v1/videos/"
+const server = `${import.meta.env.VITE_API_BASE_URL}/videos/`
+const likesServer = `${import.meta.env.VITE_API_BASE_URL}/likes/`
 export class VideoService {
     async handleGetAllVideos(opts) {
         const page = opts.page || 1;
@@ -73,7 +74,7 @@ export class VideoService {
     }
     async toggleLike(_id) {
         try {
-            const res = await axios.post(`/api/v1/likes/toggle-like/${_id}`, { withCredentials: true });
+            const res = await axios.post(`${likesServer}toggle-like/${_id}`, {}, { withCredentials: true });
             return res.data.data;
         } catch (error) {
             console.error("Error in toggling like", error);
@@ -82,7 +83,7 @@ export class VideoService {
     async getVideoLikes(videoId) {
         try {
             // console.log("Fetching likes for videoId==========>:",videoId);
-            const res = await axios.get(`/api/v1/likes/get-video-likes/${videoId}`,{ withCredentials: true });
+            const res = await axios.get(`${likesServer}get-video-likes/${videoId}`,{ withCredentials: true });
             console.log("Response from getVideoLikes --->", res.data);
             return res.data.data;
         } catch (error) {

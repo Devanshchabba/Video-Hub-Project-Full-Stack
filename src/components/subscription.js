@@ -1,5 +1,5 @@
 import axios from "axios";
-const server = "/api/v1/subscription"
+const server = `${import.meta.env.VITE_API_BASE_URL}/subscription`
 
 export  class SubscriptionService {
     async handleUserSubscribers(channelId){
