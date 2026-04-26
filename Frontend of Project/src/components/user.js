@@ -1,5 +1,5 @@
 import axios from "axios";
-const server = "/api/v1/users/"
+const server = `${import.meta.env.VITE_API_BASE_URL}/users/`
 
 export class AuthService {
 

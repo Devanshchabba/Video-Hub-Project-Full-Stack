@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const server = "/api/v1/comments/"
+const server = `${import.meta.env.VITE_API_BASE_URL}/comments/`
+const likesServer = `${import.meta.env.VITE_API_BASE_URL}/likes/`
 
 export class CommentsService {
 
@@ -52,7 +53,7 @@ export class CommentsService {
 
     async toggleCommentLike(commentId){
         try {
-            const res = await axios.post(`/api/v1/likes/toggle-comment-like/${commentId}`, {withCredentials:true});
+            const res = await axios.post(`${likesServer}toggle-comment-like/${commentId}`, {}, {withCredentials:true});
             return res.data.data;
         } catch (error) {
             console.error("Error in toggling comment like", error);
@@ -61,7 +62,7 @@ export class CommentsService {
 
     async getCommentLikes(commentId){
         try{
-            const res = await axios.get(`/api/v1/likes/get-comment-likes/${commentId}`,{withCredentials:true})
+            const res = await axios.get(`${likesServer}get-comment-likes/${commentId}`,{withCredentials:true})
             return res.data.data;
         }
         catch(error){
