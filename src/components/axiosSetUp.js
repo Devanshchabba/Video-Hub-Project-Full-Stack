@@ -1,8 +1,15 @@
 import { api } from "../components/api.js";
 import axios from 'axios';
 import { publicApi } from "../components/publicApi.js"
-// axios.defaults.baseURL = "http://localhost:8000/api/v1";
+
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+axios.defaults.baseURL = baseURL;
+axios.defaults.withCredentials = true;
+api.defaults.baseURL = baseURL;
 api.defaults.withCredentials = true;
+publicApi.defaults.baseURL = baseURL;
+publicApi.defaults.withCredentials = true;
 
 let isRefreshing = false;
 let failedQueue = [];
