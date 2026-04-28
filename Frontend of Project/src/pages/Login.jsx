@@ -5,9 +5,9 @@ import { Input } from './index.jsx'
 import { useNavigate } from 'react-router-dom';
 import authService from '../components/user.js'
 import { getErrorMessage } from '../utils/getErrorMessage.js';
-// 1. Import 'Link' from react-router-dom
+
 import { Link } from 'react-router-dom';
-// import { useForm } from 'react-hook-form'
+
 function Login() {
 
   const navigate = useNavigate();
@@ -16,11 +16,10 @@ function Login() {
 
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
-  /**
-   * A reusable input field component for the auth form.
-  */
+
+
   const handleLogin = async (data) => {
-    setError("")
+    // setError("")
 
     const indentifier = data.identifier
     const password = data.password;
