@@ -20,31 +20,30 @@ function Login() {
   */
   const handleLogin = async (data) => {
     setError("")
-    // console.log("Attempting login with data :", data)
+
     const indentifier = data.identifier
     const password = data.password;
-    // Handle form submission logic here
+
     try {
       const session = await authService.login({ indentifier, password });
       if (session) {
-        const getUser = authService.userProfile();
+        const getUser = await authService.userProfile();
         setSuccess(session.message)
         if (getUser) {
           navigate('/home');
         }
       }
     } catch (error) {
-      console.error("Error in login :", error)
-      setError(error?.message || "An error occurred during login. Please try again.")
+      console.error("Error in login :", error);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "An error occurred during login. Please try again.";
+
+      setError(message);
     }
   }
-
-  /**
-   * AuthPage
-   * A single component that handles both Login and Register views.
-  */
-  // true = Login view, false = Register view
-
 
 
   // SVG Icons
