@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import playlistService from '../components/playlist.js';
 import { Outlet } from "react-router-dom";
+import { getErrorMessage } from '../utils/getErrorMessage.js';
 
 const PlaylistCard = ({ id, thumbnailUrl, title, channelName, videoCount }) => {
   return (
@@ -58,7 +59,7 @@ function Playlist() {
       setPlaylists(res);
       console.log("Fetching playlist :", playlists);
     } catch (error) {
-      setError(error);
+      setError(getErrorMessage(error, "Failed to fetch playlists."));
     }
   }
 

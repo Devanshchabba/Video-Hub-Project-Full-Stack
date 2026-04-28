@@ -4,6 +4,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { Loading, Error, Pagination } from './index.jsx'
 import videoService from '../components/video';
 import { formatDistanceToNow } from 'date-fns';
+import { getErrorMessage } from '../utils/getErrorMessage.js';
 // import Error from './Error';
 
 
@@ -48,7 +49,7 @@ function Home() {
       setCurrentPage(response.currentPage)
       // setTotalVideos(response.total)
     } catch (error) {
-      setError(error.message)
+      setError(getErrorMessage(error, "Error while fetching videos."))
       console.error("Error in fetching :", error)
       // throw new Error("Error during fetching videos", error)
     }

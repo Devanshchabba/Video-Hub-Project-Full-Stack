@@ -1,4 +1,5 @@
 import React from 'react'
+import { getErrorMessage } from '../utils/getErrorMessage.js';
 
 function Error({ statusCode = 500, message = "An unexpected error occurred.",error }) {
 /**
@@ -7,6 +8,8 @@ function Error({ statusCode = 500, message = "An unexpected error occurred.",err
  * @param {number} props.statusCode - The HTTP status code (e.g., 404, 500).
  * @param {string} props.message - The error message to display.
  */
+  const errorMessage = getErrorMessage(error, "");
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4 font-inter">
       <div className="w-full max-w-md p-8 text-center bg-white dark:bg-gray-800 rounded-2xl shadow-xl">
@@ -38,9 +41,11 @@ function Error({ statusCode = 500, message = "An unexpected error occurred.",err
         <p className="text-2xl font-medium text-gray-700 dark:text-gray-200 mb-6">
           {message}
         </p>
-        <p className="text-2xl font-medium text-gray-700 dark:text-gray-200 mb-6">
-          {error}
-        </p>
+        {errorMessage && (
+          <p className="text-2xl font-medium text-gray-700 dark:text-gray-200 mb-6">
+            {errorMessage}
+          </p>
+        )}
         
         {/* "Go Home" Link */}
         <a

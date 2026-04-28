@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { Input } from './index.jsx'
 import { useNavigate } from 'react-router-dom';
 import authService from '../components/user.js'
+import { getErrorMessage } from '../utils/getErrorMessage.js';
 // 1. Import 'Link' from react-router-dom
 import { Link } from 'react-router-dom';
 // import { useForm } from 'react-hook-form'
@@ -36,12 +37,7 @@ function Login() {
     } catch (error) {
       console.error("Error in login :", error);
 
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "An error occurred during login. Please try again.";
-
-      setError(message)
+      setError(getErrorMessage(error, "An error occurred during login. Please try again."))
     }
   }
 

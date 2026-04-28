@@ -7,6 +7,7 @@ import commentService from '../components/comments.js';
 import { useForm } from 'react-hook-form';
 import CommentMenu from '../components/CommentMenu.jsx';
 import { formatDistanceToNow } from 'date-fns';
+import { getErrorMessage } from '../utils/getErrorMessage.js';
 
 /**
  * VideoWatchPage.jsx
@@ -41,7 +42,7 @@ function VideoPlayer() {
       // console.log("videoFile", res.data.data.videoFile)
     } catch (error) {
       console.error("Error fetching video: ", error)
-      setError(error)
+      setError(getErrorMessage(error, "Error in fetching video."))
     } finally {
       setLoading(false)
     }
@@ -103,7 +104,7 @@ function VideoPlayer() {
       setToggleSubscribe(res.data.isSubscribed);
       setIsSubscribed(res.data.isSubscribed); // ✅ keep in sync
     } catch (error) {
-      setError(error);
+      setError(getErrorMessage(error, "Error in toggling subscription."));
     }
   };
 
@@ -161,7 +162,7 @@ function VideoPlayer() {
       setComments(res)
     } catch (error) {
       console.error("Error fetching comments", error);
-      setError(error);
+      setError(getErrorMessage(error, "Error in fetching comments."));
       // <Error
       //   message={"Error in fetching comments"}
       //   error={error} />
@@ -191,7 +192,7 @@ function VideoPlayer() {
       reset()
 
     } catch (error) {
-      setError(error)
+      setError(getErrorMessage(error, "Error in adding comment."))
     }
   }
 
@@ -204,7 +205,7 @@ function VideoPlayer() {
       console.log("Delete comment --->", res);
       showMessage("Comment deleted successfully");
     } catch (error) {
-      setError(error)
+      setError(getErrorMessage(error, "Error in deleting comment."))
     }
   }
 
@@ -233,7 +234,7 @@ function VideoPlayer() {
       setEditingData("");
       showMessage("Comment edited successfully");
     } catch (error) {
-      setError(error)
+      setError(getErrorMessage(error, "Error in editing comment."))
       console.error(error);
     }
   };
@@ -252,7 +253,7 @@ function VideoPlayer() {
       // setIsCommentLiked(res.isLiked)
       handleGetCommentLikes(commentId);
     } catch (error) {
-      setError(error);
+      setError(getErrorMessage(error, "Error in toggling comment like."));
       console.error("Error in toggling comment like", error);
     }
   }
@@ -265,7 +266,7 @@ function VideoPlayer() {
       setIsCommentLiked(res.likes?.some((like) => like.likedBy === owner._id))
       console.log("Likes of comment  --->", commentLikes)
     } catch (error) {
-      setError(error);
+      setError(getErrorMessage(error, "Error in fetching comment likes."));
       console.log("Error in fetching comment likes", error);
     } finally { setLoading(false); }
   }
@@ -305,7 +306,7 @@ function VideoPlayer() {
       setVideos(res.videos);
     } catch (error) {
       console.error("Error in fetching videos for channel sidebar", error);
-      setError(error);
+      setError(getErrorMessage(error, "Error in fetching related videos."));
     }
   }
 
