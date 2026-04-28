@@ -36,7 +36,7 @@ function Login() {
       }
     } catch (error) {
       console.error("Error in login :", error)
-      setError(error)
+      setError(getErrorMessage(error,"An error occurred during login. Please try again."));
     }
   }
 
