@@ -41,7 +41,7 @@ function Login() {
         error?.message ||
         "An error occurred during login. Please try again.";
 
-      setError(message);
+      setError(message)
     }
   }
 
