@@ -28,7 +28,7 @@ function Login() {
     try {
       const session = await authService.login({ indentifier, password });
       if (session) {
-        const getUser = authService.userProfile();
+        const getUser = await authService.userProfile();
         setSuccess(session.message)
         if (getUser) {
           navigate('/home');
@@ -36,7 +36,7 @@ function Login() {
       }
     } catch (error) {
       console.error("Error in login :", error)
-      setError(getErrorMessage(error, "An error occurred during login. Please try again."))
+      setError(error)
     }
   }
 
