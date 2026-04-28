@@ -1,6 +1,6 @@
 import { useState } from "react";
 import playlistService from "../components/playlist";
-
+import { getErrorMessage } from '../utils/getErrorMessage.js';
 export default function CreatePlaylist() {
   const [playlistName, setPlaylistName] = useState("");
   const [description, setDescription] = useState("");
@@ -17,7 +17,7 @@ export default function CreatePlaylist() {
       setPlaylistName("");
       setDescription("");
     } catch (err) {
-      setError(err?.response?.data?.message || "Error creating playlist");
+      setError(getErrorMessage(error,"Error creating playlist"));
       console.error("Error in Creating Playlist");
     }
   };
