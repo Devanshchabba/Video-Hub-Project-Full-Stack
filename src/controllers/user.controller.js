@@ -6,6 +6,12 @@ import { ApiResponse } from '../utils/apiResponse.js'
 import jwt from 'jsonwebtoken'
 import mongoose from "mongoose";
 
+const buildCookieOptions = () => ({
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/"
+});
 
 const registerUser = asyncHandler(async (req, res) => {
 
@@ -31,23 +37,20 @@ const registerUser = asyncHandler(async (req, res) => {
     if (existedUser) {
         throw new ApiError(409, "User with Email or userName already exist")
     }
-    console.log("Avatar : ", req.files.avatar[0].path)
-
-    const avatarLocalPath = await req.files?.avatar[0]?.path;
-    // const coverImageLocalPath = await req.files?.coverImage[0]?.path;
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
 
     let coverImageLocalPath = "";
-    // if (req.files && Array.isArray(req.files.CoverImage) && coverImage.length > 0) {
     if (req.files?.coverImage?.length > 0) {
         coverImageLocalPath = req.files?.coverImage[0]?.path
     }
-    console.log("CoverImage local path --- >", coverImageLocalPath)
 
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar is required")
     }
     const avatar = await cloudinaryUpload(avatarLocalPath)
-    const coverImage = await cloudinaryUpload(coverImageLocalPath)
+    const coverImage = coverImageLocalPath
+        ? await cloudinaryUpload(coverImageLocalPath)
+        : null;
 
     if (!avatar) {
         throw new ApiError(400, "Avatar is required")
@@ -139,10 +142,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const { refreshToken, accessToken } = await generateAccessTokenRefreshToken(userId)
 
     // user.refreshToken(refreshToken) // if not running properly i can also call the user.body again as done above
-    const options = {  // only server can modify cookies also known secure cookies
-        httpOnly: true,
-        secure: true
-    }
+    const options = buildCookieOptions();
     // user.password = undefined;
     // user.refreshToken = undefined;
 
@@ -187,10 +187,7 @@ const logOutUser = asyncHandler(async (req, res) => {
             new: true
         }
     )
-    const option = {  // only server can modify cookies also known secure cookies
-        httpOnly: true,
-        secure: true
-    }
+    const option = buildCookieOptions();
     return res.status(200)
         .clearCookie("accessToken", option)
         .clearCookie("refreshToken", option)
@@ -228,12 +225,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
-    const options = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/"
-    };
+    const options = buildCookieOptions();
 
     return res
         .status(200)

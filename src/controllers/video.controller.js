@@ -6,6 +6,7 @@ import { ApiResponse } from '../utils/apiResponse.js';
 import Video from '../models/video.model.js'
 import mongoose from 'mongoose'
 import { v2 as cloudinary } from 'cloudinary'
+import axios from 'axios'
 
 const uploadVideo = asyncHandler(async (req, res) => {
     //steps to publish a video

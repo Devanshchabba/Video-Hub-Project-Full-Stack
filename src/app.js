@@ -4,8 +4,20 @@ import cors from "cors";
 
 const app = express();
 
+const rawAllowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+const allowAllOrigins = rawAllowedOrigins.includes("*");
+
 app.use(cors({
-    origin :process.env.CORS_ORIGIN,
+    origin(origin, callback) {
+        if (!origin || allowAllOrigins || rawAllowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     credentials: true,
 }))
 

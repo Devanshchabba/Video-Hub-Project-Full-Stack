@@ -8,3 +8,4 @@ router.route('/get-channel-videos/:channelId').get(jwtVerify,getChannelVideos)
 router.route('/get-channel-stats/:channelId').get(jwtVerify,getChannelStats)
 
 export default router
+ 

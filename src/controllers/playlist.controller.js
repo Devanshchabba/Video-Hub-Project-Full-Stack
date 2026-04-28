@@ -153,6 +153,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "You are unauthorized to delete this playlist")
     }
     await Playlist.deleteOne(playlist)
+    
 
     return res
         .status(200)
@@ -163,8 +164,8 @@ const deletePlaylist = asyncHandler(async (req, res) => {
                 "Playlist deleted Successfully"
             )
         )
-
 })
+
 
 const updatePlaylist = asyncHandler(async (req, res) => {
     const playlistId = req.params.playlistId
