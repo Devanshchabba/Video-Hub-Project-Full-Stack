@@ -14,13 +14,15 @@
     "axios": "^1.13.1",
     "data-fns": "^1.1.0",
     "date-fns": "^4.1.0",
+    "form": "^0.2.5",
+    "hook": "^0.1.0",
     "lightningcss": "^1.30.2",
     "lucide-react": "^0.575.0",
     "mux-embed": "^5.13.0",
-    "react": "^19.1.1",
+    "react": "^19.2.5",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.66.0",
-    "react-router-dom": "^7.9.4",
+    "react-router-dom": "^7.14.2",
     "video.js": "^8.23.4"
   },
   "devDependencies": {

@@ -23,6 +23,7 @@ export class AuthService {
         }
     }
     async login({ indentifier, password }) {
+        console.log("FormData ----> ",indentifier)
         const formData = {
             indentifier: indentifier,
             password: password,
