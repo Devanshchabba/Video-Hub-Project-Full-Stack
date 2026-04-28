@@ -34,15 +34,18 @@ function Login() {
         }
       }
     } catch (error) {
-      console.error("Error in login :", error);
+  console.error("Error in login :", error);
 
-    const message =
-      error?.response?.data?.message ||
-      error?.message ||
-      "An error occurred during login. Please try again.";
+  let message = "Something went wrong";
 
-    setError(message);
-    }
+  if (error?.response?.data?.message) {
+    message = error.response.data.message;
+  } else if (error?.message) {
+    message = error.message;
+  }
+
+  setError(String(message));   // ✅ FORCE string
+}
   }
 
   /**
