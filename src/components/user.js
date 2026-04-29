@@ -37,7 +37,7 @@ export class AuthService {
             }
         } catch (error) {
             console.error("Error logging in user", error);
-            throw error
+            // throw error
         }
     }
     async logout() {
