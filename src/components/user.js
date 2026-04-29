@@ -10,7 +10,8 @@ export class AuthService {
             return res.data.data;
         } catch (error) {
             console.error("Error registering user", error);
-            throw error;
+            // throw error;
+            return null
         }
     }
     async userProfile() {
@@ -54,7 +55,8 @@ export class AuthService {
 
         } catch (error) {
             console.error("Error logging Out user", error);
-            throw error;
+            // throw error;
+            return null
         }
     }
     async changePassword(userData) {
@@ -69,7 +71,8 @@ export class AuthService {
 
         } catch (error) {
             console.error("Error during handling ChangePassword", error);
-            throw error;
+            // throw error;
+            return null
         }
     }
     async getUser() {
@@ -78,6 +81,7 @@ export class AuthService {
             return response.data.data;
         } catch (error) {
             console.error("Error in fetching user", error)
+            return null
         }
     }
     async getChannelProfile(userName) {
@@ -92,7 +96,8 @@ export class AuthService {
             return response.data.data;
         } catch (error) {
             console.error("Error in fetching Channel Data", error);
-            throw error;
+            // throw error;
+            return null
         }
     }
 
@@ -103,6 +108,7 @@ export class AuthService {
             console.log(response.data.data)
         } catch (error) {
             console.error("Error in Regenerating Access Token", error)
+            return null
         }
     }
 }
