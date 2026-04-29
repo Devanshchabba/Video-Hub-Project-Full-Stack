@@ -57,11 +57,8 @@ function VideoPlayer() {
       // console.log(res.data)
       setSubscribers(res ?? 0);
     } catch (error) {
-      <Error
-        message={"Error in Fetching Subsribers"}
-        statusCode={401}
-        error={error} />
       console.error("Error in fetching subscribers:", error)
+      setError(getErrorMessage(error, "Error in fetching subscribers."));
     } finally {
       setLoading(false)
     }
@@ -87,11 +84,15 @@ function VideoPlayer() {
 
   const initialSubscribed = async () => {
     if (!owner._id) return;
-    const res = await subscriptionService.handleIsSubscribed(owner._id);
-    console.log("isSubscribed---->", res)
-    setIsSubscribed(res);
-    setToggleSubscribe(res);
-    // return res;
+    try {
+      const res = await subscriptionService.handleIsSubscribed(owner._id);
+      console.log("isSubscribed---->", res)
+      setIsSubscribed(res);
+      setToggleSubscribe(res);
+    } catch (error) {
+      console.error("Error in initializing subscription state", error);
+      setError(getErrorMessage(error, "Error in checking subscription status."));
+    }
   }
   // console.log("Initial subscribed value --->",res)
 

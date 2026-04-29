@@ -9,6 +9,7 @@ import { ThemeProvider } from "./ThemeContext.jsx";
 
 import './components/axiosSetUp.js'
 import SearchPage from './pages/SearchPage.jsx'
+import RouteError from './pages/RouteError.jsx'
 
 // createRoot(document.getElementById('root')).render(
 //   <StrictMode>
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    errorElement: <RouteError />,
     children: [
       {
         path: 'playlists',
