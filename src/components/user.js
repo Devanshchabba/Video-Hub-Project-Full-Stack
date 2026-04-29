@@ -19,7 +19,7 @@ export class AuthService {
             return response.data.data;
         } catch (error) {
             console.error("Error fetching user profile", error);
-            throw error;
+            return null
         }
     }
     async login({ indentifier, password }) {
@@ -38,6 +38,7 @@ export class AuthService {
         } catch (error) {
             console.error("Error logging in user", error);
             // throw error
+            return null
         }
     }
     async logout() {
