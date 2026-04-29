@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getErrorMessage } from "../utils/getErrorMessage.js";
 
 const server = `${import.meta.env.VITE_API_BASE_URL}/playlists/`
 class PlaylistService {
@@ -27,7 +28,7 @@ class PlaylistService {
             return res.data.data;
         } catch (error) {
             console.error("Error fetching playlist By Id", error);
-            throw error;
+            throw new Error(getErrorMessage(error, "Error fetching playlist."));
         }
     }
     async addVideo({playlistId, videoId}) {
@@ -38,7 +39,7 @@ class PlaylistService {
 
         } catch (error) {
             console.error("Error in adding video to playlist", error);
-            throw error;
+            throw new Error(getErrorMessage(error, "Error adding video to playlist."));
         }
     }
 }

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getErrorMessage } from "../utils/getErrorMessage.js";
 const server = `${import.meta.env.VITE_API_BASE_URL}/subscription`
 
 export  class SubscriptionService {
@@ -29,7 +30,7 @@ export  class SubscriptionService {
         }
         catch(error){
             console.error("Error in fetching isSubscribed",error)
-            throw error
+            throw new Error(getErrorMessage(error, "Error checking subscription status."));
         }
     }
 }

@@ -1,5 +1,5 @@
 import axios from "axios"
-import Error from "../pages/Error";
+import { getErrorMessage } from "../utils/getErrorMessage.js";
 
 
 const server = `${import.meta.env.VITE_API_BASE_URL}/videos/`
@@ -43,7 +43,7 @@ export class VideoService {
 
         } catch (error) {
             console.log("Error in fetching video :", error)
-            throw error;
+            throw new Error(getErrorMessage(error, "Error fetching videos."));
         }
     }
     async getVideo(videoId) {
@@ -52,7 +52,7 @@ export class VideoService {
             return response
         } catch (error) {
             console.error("Error in fetching video", error)
-            throw error
+            throw new Error(getErrorMessage(error, "Error fetching video."));
         }
     }
     async handleUploadVideo(opts) {
@@ -61,7 +61,7 @@ export class VideoService {
             return response.data
         } catch (error) {
             console.error("Error in uploading video:", error)
-            throw error
+            throw new Error(getErrorMessage(error, "Error uploading video."));
         }
     }
     async getChannelVideos(channelId) {

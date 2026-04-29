@@ -5,6 +5,7 @@ import authService from '../components/user.js'
 import { useTheme } from "../ThemeContext.jsx";
 import videoService from '../components/video.js';
 import { useSearchParams } from 'react-router-dom'
+import { getErrorMessage } from '../utils/getErrorMessage.js';
 // import {search} from 'lucide-react'
 
 
@@ -156,7 +157,7 @@ function NavBar() {
 
         {error && (
           <div className="my-4 rounded-lg bg-red-100 p-3 text-center text-sm font-medium text-red-700 dark:bg-red-900 dark:text-red-200">
-            {error.message}
+            {getErrorMessage(error)}
           </div>
         )}
 

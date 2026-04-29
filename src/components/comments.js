@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getErrorMessage } from "../utils/getErrorMessage.js";
 
 const server = `${import.meta.env.VITE_API_BASE_URL}/comments/`
 const likesServer = `${import.meta.env.VITE_API_BASE_URL}/likes/`
@@ -12,7 +13,7 @@ export class CommentsService {
             return res.data.data;
         } catch (error) {
             console.error("Error fetching comments", error);
-            throw error;
+            throw new Error(getErrorMessage(error, "Error fetching comments."));
         }
     }
     async addComment(commentData, videoId) {
@@ -27,7 +28,7 @@ export class CommentsService {
             return res.data.data;
         } catch (error) {
             console.error("Error adding comment", error);
-            throw error;
+            throw new Error(getErrorMessage(error, "Error adding comment."));
         }
     }
     async deleteComment(commentId) {
@@ -36,7 +37,7 @@ export class CommentsService {
             return res.data.data
         } catch (error) {
             console.error("Error Deleting comment", error);
-            throw error;
+            throw new Error(getErrorMessage(error, "Error deleting comment."));
         }
     }
     async editComment(commentId, updatedData) {
@@ -47,7 +48,7 @@ export class CommentsService {
             return res.data.data;
         } catch (error) {
             console.error("Error Editing comment", error);
-            throw error;
+            throw new Error(getErrorMessage(error, "Error editing comment."));
         }
     }
 

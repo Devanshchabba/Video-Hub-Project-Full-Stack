@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import videoService from '../components/video.js';
 import { useNavigate, useParams } from 'react-router-dom'
-import { Loading, Player, InlineMessage, Input } from './index.jsx'
+import { Loading, Player, InlineMessage, Input, Error } from './index.jsx'
 import subscriptionService from '../components/subscription.js';
 import commentService from '../components/comments.js';
 import { useForm } from 'react-hook-form';
