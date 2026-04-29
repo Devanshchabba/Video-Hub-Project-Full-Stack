@@ -14,7 +14,7 @@ function ChannelPage() {
         totalPages: 0,
         videos: []
     })
-    const [subscribers, setSubscribers] = useState({})
+    const [subscribers, setSubscribers] = useState(0)
 
     const userName = useParams();
 
@@ -44,7 +44,7 @@ function ChannelPage() {
         try {
             // console.log("User Id is ---> ", user._id)
             const res = await subscriptionService.handleUserSubscribers(user._id);
-            setSubscribers(res);
+            setSubscribers(res ?? 0);
             // console.log("Channel Subscribers :", res);
 
         } catch (error) {
@@ -78,7 +78,7 @@ function ChannelPage() {
     const userObject = {
         name: user.fullName,
         avatar: user.avatar,
-        subscribers: subscribers.data || 0,
+        subscribers: subscribers || 0,
         videos: video.total || 0,
         coverImage: user.coverImage
     };

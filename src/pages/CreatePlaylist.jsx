@@ -17,7 +17,7 @@ export default function CreatePlaylist() {
       setPlaylistName("");
       setDescription("");
     } catch (err) {
-      setError(getErrorMessage(error,"Error creating playlist"));
+      setError(getErrorMessage(err, "Error creating playlist"));
       console.error("Error in Creating Playlist");
     }
   };

@@ -55,7 +55,7 @@ function VideoPlayer() {
     try {
       const res = await subscriptionService.handleUserSubscribers(userId)
       // console.log(res.data)
-      setSubscribers(res.data);
+      setSubscribers(res ?? 0);
     } catch (error) {
       <Error
         message={"Error in Fetching Subsribers"}
@@ -101,8 +101,8 @@ function VideoPlayer() {
 
     try {
       const res = await subscriptionService.handleToggleSubscribe(owner._id);
-      setToggleSubscribe(res.data.isSubscribed);
-      setIsSubscribed(res.data.isSubscribed); // ✅ keep in sync
+      setToggleSubscribe(res?.isSubscribed);
+      setIsSubscribed(res?.isSubscribed);
     } catch (error) {
       setError(getErrorMessage(error, "Error in toggling subscription."));
     }
@@ -410,7 +410,7 @@ function VideoPlayer() {
                 <a href="#" className="text-base font-semibold text-gray-900 hover:text-red-600 dark:text-gray-300">
                   {owner.fullName}
                 </a>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{subscribers} Subscribers</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{subscribers || 0} Subscribers</p>
               </div>
             </div>
             {<button onClick={handleSubscribeToggle}
@@ -648,3 +648,4 @@ function VideoPlayer() {
 }
 
 export default VideoPlayer;
+

@@ -8,7 +8,7 @@ export  class SubscriptionService {
             // console.log("Fetching subscribers for channel ID:", channelId);
             const res = await axios.get(`${server}/user-subscribers-count/${channelId}`)
             // console.log("Response------>",res.data)
-            return res.data;
+            return res.data?.data ?? 0;
 
         } catch (error) {
             console.error("Error in fetching userSubscribers",error);
@@ -17,7 +17,7 @@ export  class SubscriptionService {
     async handleToggleSubscribe(channelId){
         try {
             const res = await axios.post(`${server}/toggle-subscribe/${channelId}`)
-            return res.data;
+            return res.data?.data ?? res.data;
         } catch (error) {
             console.log("Error in fetching toggle Subscribe",error)
         }

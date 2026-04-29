@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import videoService from '../components/video.js'; // Make sure this path is correct
 import Loading from '../assets/Loading.jsx'; // Import your Loading
+import { getErrorMessage } from '../utils/getErrorMessage.js';
 
 function UploadVideoForm() {
     // State for text fields
@@ -77,8 +78,7 @@ function UploadVideoForm() {
             document.getElementById('thumbnail').value = null;
 
         } catch (err) {
-            setError(err.message || 'An unknown error occurred during upload.');
-            throw err
+            setError(getErrorMessage(err, 'An unknown error occurred during upload.'));
         } finally {
             setUploading(false);
         }
