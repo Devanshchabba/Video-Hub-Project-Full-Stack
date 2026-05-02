@@ -28,9 +28,11 @@ export class AuthService {
             indentifier: indentifier,
             password: password,
         }
+        console.log(formData);
         try {
             const response = await axios.post(`${server}login`, formData);
             const responseData = response.data
+
             const token = responseData.data.refreshToken
             if (token) {
                 localStorage.setItem("refreshToken", token);
