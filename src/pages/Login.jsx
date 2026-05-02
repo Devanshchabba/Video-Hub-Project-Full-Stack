@@ -20,8 +20,8 @@ function Login() {
    * A reusable input field component for the auth form.
   */
   const handleLogin = async (data) => {
-    // setError("")
-    // console.log("Attempting login with data :", data)
+    setError("")
+    console.log("Attempting login with data :", data)
     const indentifier = data.identifier
     const password = data.password;
     // Handle form submission logic here

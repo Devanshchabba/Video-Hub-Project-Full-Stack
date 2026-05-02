@@ -31,14 +31,26 @@ function VideoPlayer() {
   const [showMsg, setShowMsg] = useState(false);
   const [message, setMessage] = useState("");
 
+  const toText = (value, fallback = "") => {
+    if (value == null) return fallback;
+    if (typeof value === "string" || typeof value === "number") return value;
+    return getErrorMessage(value, fallback);
+  };
+
+  const toCount = (value, fallback = 0) => {
+    const count = Number(value);
+    return Number.isFinite(count) ? count : fallback;
+  };
+
 
   const handleVideo = async (video_id) => {
     if (!video_id) return;
     setLoading(true);
     try {
       const res = await videoService.getVideo(video_id)
-      setVideo(res.data.data)
-      setOwner(res.data.data.owner)
+      const videoData = res?.data?.data;
+      setVideo(videoData && typeof videoData === "object" ? videoData : {})
+      setOwner(videoData?.owner && typeof videoData.owner === "object" ? videoData.owner : {})
       // console.log("videoFile", res.data.data.videoFile)
     } catch (error) {
       console.error("Error fetching video: ", error)
@@ -55,7 +67,7 @@ function VideoPlayer() {
     try {
       const res = await subscriptionService.handleUserSubscribers(userId)
       // console.log(res.data)
-      setSubscribers(res ?? 0);
+      setSubscribers(toCount(res, 0));
     } catch (error) {
       console.error("Error in fetching subscribers:", error)
       setError(getErrorMessage(error, "Error in fetching subscribers."));
@@ -124,11 +136,13 @@ function VideoPlayer() {
     if (!videoId) return;
     try {
       const res = await videoService.getVideoLikes(videoId);
-      setLikes(res);
+      setLikes(res && typeof res === "object" ? res : {});
       console.log("Likes fetched --->", res);
-      const isUserliked = res.likes?.filter((like) => like.likedBy._id === owner._id);
+      const isUserliked = Array.isArray(res?.likes)
+        ? res.likes.filter((like) => like?.likedBy?._id === owner._id)
+        : [];
 
-      if (!isUserliked) setIsLiked(false);
+      if (isUserliked.length === 0) setIsLiked(false);
       else setIsLiked(true);
 
     } catch (error) {
@@ -160,7 +174,7 @@ function VideoPlayer() {
     try {
       const res = await commentService.getVideoComments(video_id)
       // console.log("Comments are ---->", res)
-      setComments(res)
+      setComments(Array.isArray(res) ? res : [])
     } catch (error) {
       console.error("Error fetching comments", error);
       setError(getErrorMessage(error, "Error in fetching comments."));
@@ -185,10 +199,9 @@ function VideoPlayer() {
     if (!video_id) return;
     console.log("Data of comment---->", data)
     try {
-      const res = await commentService.addComment(data.comment, video_id);
+      await commentService.addComment(data.comment, video_id);
       // console.log("resppnse is this--->", res)
       showMessage("Comment added Successfully")
-      setComments((prev) => [data.comment, ...prev]);
       handleComments()
       reset()
 
@@ -263,8 +276,8 @@ function VideoPlayer() {
     try {
       const res = await commentService.getCommentLikes(commentId);
       console.log("Fetched comment likes  --->", res);
-      setCommentLikes((prev) => ({ ...prev, [commentId]: res }));
-      setIsCommentLiked(res.likes?.some((like) => like.likedBy === owner._id))
+      setCommentLikes((prev) => ({ ...prev, [commentId]: res && typeof res === "object" ? res : {} }));
+      setIsCommentLiked(Array.isArray(res?.likes) ? res.likes.some((like) => like?.likedBy === owner._id) : false)
       console.log("Likes of comment  --->", commentLikes)
     } catch (error) {
       setError(getErrorMessage(error, "Error in fetching comment likes."));
@@ -304,12 +317,25 @@ function VideoPlayer() {
   const fetchVideos = async () => {
     try {
       const res = await videoService.handleGetAllVideos({ owner: owner._id, limit: 20 })
-      setVideos(res.videos);
+      setVideos(Array.isArray(res?.videos) ? res.videos : []);
     } catch (error) {
       console.error("Error in fetching videos for channel sidebar", error);
       setError(getErrorMessage(error, "Error in fetching related videos."));
     }
   }
+
+  const commentItems = Array.isArray(comments)
+    ? comments.filter((comment) => comment && typeof comment === "object")
+    : [];
+  const relatedVideos = Array.isArray(videos)
+    ? videos.filter((item) => item && typeof item === "object")
+    : [];
+  const likeCount = toCount(likes?.len, 0);
+  const subscriberCount = toCount(subscribers, 0);
+  const videoViews = toText(video?.views, 0);
+  const videoTitle = toText(video?.title, "");
+  const videoDescription = toText(video?.description, "");
+  const ownerName = toText(owner?.fullName, "");
 
 
   // useEffect(() => {
@@ -356,12 +382,12 @@ function VideoPlayer() {
           {/* 2. Video Title and Actions */}
           <div className="mt-4 ">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-300">
-              {video.title}
+              {videoTitle}
             </h1>
             <div className="mt-2 flex flex-col items-start justify-between sm:flex-row sm:items-center">
               {/* Views and Date */}
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {video.views} views  &bull; {video.createdAt ? formatDistanceToNow(new Date(video.createdAt)) + ' ago' : ''}
+                {videoViews} views  &bull; {video.createdAt ? formatDistanceToNow(new Date(video.createdAt)) + ' ago' : ''}
               </p>
 
               {/* Action Buttons: Like, Save */}
@@ -385,7 +411,7 @@ function VideoPlayer() {
                       d="M7 11v10H3V11h4zm14-1a2 2 0 00-2-2h-5.5l.9-3.9.1-.6a1.5 1.5 0 00-.44-1.06L12 1.5 6.5 7v12a2 2 0 002 2h7.2a2 2 0 001.9-1.3l2.6-6.2c.1-.2.2-.5.2-.7v-2.8z"
                     />
                   </svg>
-                  {likes.len} Likes
+                  {likeCount} Likes
                 </button>
                 {/* Save Button */}
                 <button className="flex items-center rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-800 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600">
@@ -409,9 +435,9 @@ function VideoPlayer() {
               />
               <div className="ml-3">
                 <a href="#" className="text-base font-semibold text-gray-900 hover:text-red-600 dark:text-gray-300">
-                  {owner.fullName}
+                  {ownerName}
                 </a>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{subscribers || 0} Subscribers</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{subscriberCount} Subscribers</p>
               </div>
             </div>
             {<button onClick={handleSubscribeToggle}
@@ -423,7 +449,7 @@ function VideoPlayer() {
           {/* 4. Description Box */}
           <div className="mt-4 rounded-lg bg-gray-100 p-4">
             <p className="text-sm font-medium text-gray-800">
-              {video.description}
+              {videoDescription}
             </p>
             <p className="mt-2 text-sm text-gray-700">
               Here is the main description of the video. It can contain links, hashtags,
@@ -439,7 +465,7 @@ function VideoPlayer() {
             {/* Comment Header */}
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-300 dark:bg-bg-gray-700">
-                {comments.length} Comments
+                {commentItems.length} Comments
               </h2>
               <button className="flex items-center text-sm font-medium text-gray-700 hover:text-black dark:text-gray-300 dark:bg-bg-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="mr-2 h-5 w-5">
@@ -477,7 +503,7 @@ function VideoPlayer() {
 
 
             {/* Comment List */}
-            {comments.map((comment) => (
+            {commentItems.map((comment) => (
               <div className="mt-6 space-y-6 " key={comment._id} >
                 {/* Comment 1 */}
                 <div className="flex items-start space-x-3 " >
@@ -491,7 +517,8 @@ function VideoPlayer() {
                   {/* onClick={navigate(`/userChannel/${comment.user.userName}`)}  */}
                   <div className="flex-1 relative">
                     <div className="flex items-baseline space-x-2">
-                      <a href={`/userChannel/${comment.user?.userName}`} className="text-sm font-semibold text-gray-800 dark:text-gray-300">{comment.user?.fullName}</a>
+                      <a href={`/userChannel/${comment.user?.userName}`} className="text-sm font-semibold text-gray-800 dark:text-gray-300">{toText(comment.user?.fullName, "")}</a>
+                      
                       <span className="text-xs text-gray-500">2 days ago</span>
                     </div>
                     <div className='absolute right-0'><CommentMenu
@@ -503,7 +530,7 @@ function VideoPlayer() {
 
                     {editingId !== comment._id && (
                       <p className="mt-1 text-sm text-gray-700">
-                        {comment.content}
+                        {toText(comment.content, "")}
                       </p>
                     )}
 
@@ -543,7 +570,7 @@ function VideoPlayer() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.166 1.712a4.5 4.5 0 01-1.825 5.234c-.98.614-2.185.986-3.417.986H6.633a.75.75 0 01-.75-.75V11.25c0-.414.336-.75.75-.75zM6.633 10.5l-2.221 4.673a.75.75 0 00.22 1.004l.49.245a.75.75 0 001.004-.22l2.221-4.673M6.633 10.5v1.907c0 .835.672 1.507 1.507 1.507h8.493a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75H9.743c-1.216 0-2.27-.775-2.643-1.907a.75.75 0 00-1.004-.22l-.49-.245a.75.75 0 00-.22 1.004l2.221 4.673a.75.75 0 001.224.24l.17-.341a.75.75 0 011.004-.22l.49.245a.75.75 0 01.22 1.004l-2.221 4.673a.75.75 0 01-1.224.24l-.17-.341a.75.75 0 00-1.004-.22l-.49.245a.75.75 0 00-.22 1.004l2.221 4.673a.75.75 0 001.224.24l.17-.341a.75.75 0 011.004-.22l.49.245a.75.75 0 01.22 1.004l-2.221 4.673a.75.75 0 01-1.224.24L4.818 21.03a.75.75 0 01-.22-1.004l.49-.245a.75.75 0 011.004-.22l2.221 4.673.01.021z" />
                         </svg>
                         {/* {commentLikes.len} */}
-                        {commentLikes[comment?._id]?.len ?? 0} Likes
+                        {toCount(commentLikes[comment?._id]?.len, 0)} Likes
                       </button>
                       <button className="text-xs font-medium text-gray-600 hover:text-black">[Reply]</button>
                     </div>
@@ -614,10 +641,10 @@ function VideoPlayer() {
             [Related Videos]
           </h3>
 
-          {videos.length > 0 &&
+          {relatedVideos.length > 0 &&
             <div className="flex flex-col space-y-4">
-              {videos.map((video) => (
-                <div className="group flex space-x-3">
+              {relatedVideos.map((video) => (
+                <div className="group flex space-x-3" key={video._id}>
                   <a href={`/video-player/${video._id}`} className="flex-shrink-0">
                     <img
                       src={video.thumbnail}
@@ -627,13 +654,13 @@ function VideoPlayer() {
                   </a>
                   <div className="flex-1">
                     <a href={`/video-player/${video._id}`} className=" dark:text-gray-300 text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-red-600">
-                      {video.title}
+                      {toText(video.title, "")}
                     </a>
                     <a href={`/channel/${video.owner}`} className="mt-1 block text-xs text-gray-600 hover:text-gray-900">
                       
                     </a>
                     <p className="mt-1 text-xs text-gray-500">
-                      {video.views} views &bull; {video.createdAt ? formatDistanceToNow(new Date(video.createdAt)) + ' ago' : ''} 
+                      {toText(video.views, 0)} views &bull; {video.createdAt ? formatDistanceToNow(new Date(video.createdAt)) + ' ago' : ''} 
                     </p>
                   </div>
                 </div>
