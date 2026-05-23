@@ -18,19 +18,34 @@ const cloudinaryUpload = async (localFile) => {
             return null;
         }
         const uploadResult = await cloudinary.uploader.upload(localFile, {
-                resource_type: 'auto',
-                  // Automatically detect the resource type (image, video, etc.)
-            })
-        // console.log("File uploaded successfully to Cloudinary");
-        // console.log(uploadResult.url)
-        // console.log(uploadResult)
-        fs.unlinkSync(localFile)
+            resource_type: 'auto',
+            // Automatically detect the resource type (image, video, etc.)
+        });
+        fs.unlinkSync(localFile);
         return uploadResult;
     } catch (error) {
-        fs.unlinkSync(localFile); // Delete the local file if upload fails
+        if (localFile && fs.existsSync(localFile)) {
+            fs.unlinkSync(localFile); // Delete the local file if upload fails
+        }
         console.error('Error uploading file to Cloudinary:', error);
-    };
-}
+        return null;
+    }
+};
+
+export const uploadFilesToCloudinary = async (files = []) => {
+    if (!Array.isArray(files) || !files.length) return [];
+
+    const uploadPromises = files.map(async (file) => {
+        const filePath = file?.path || file;
+        if (!filePath) return null;
+        const result = await cloudinaryUpload(filePath);
+        return result?.secure_url || null;
+    });
+
+    const results = await Promise.all(uploadPromises);
+    return results.filter(Boolean);
+};
+
 export default cloudinaryUpload
 
 
