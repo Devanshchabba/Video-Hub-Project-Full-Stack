@@ -5,6 +5,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import Subscription from "../models/subscription.model.js";
+import { attachPlaybackUrlsToList } from "../utils/videoPlayback.js";
 
 
 const getChannelStats = asyncHandler(async (req, res) => {
@@ -62,7 +63,7 @@ const getChannelVideos = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 {
-                    videos,
+                    videos: attachPlaybackUrlsToList(videos, req),
                     videoCount
                 },
                 "Channel Videos Fetched Successfully"

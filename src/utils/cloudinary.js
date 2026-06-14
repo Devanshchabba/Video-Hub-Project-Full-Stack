@@ -11,7 +11,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-const cloudinaryUpload = async (localFile) => {
+const cloudinaryUpload = async (localFile, uploadOptions = {}) => {
     try {
         if (!localFile) {
             console.error("No file provided for upload");
@@ -19,9 +19,11 @@ const cloudinaryUpload = async (localFile) => {
         }
         const uploadResult = await cloudinary.uploader.upload(localFile, {
             resource_type: 'auto',
-            // Automatically detect the resource type (image, video, etc.)
+            ...uploadOptions,
         });
-        fs.unlinkSync(localFile);
+        if (fs.existsSync(localFile)) {
+            fs.unlinkSync(localFile);
+        }
         return uploadResult;
     } catch (error) {
         if (localFile && fs.existsSync(localFile)) {

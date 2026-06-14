@@ -5,6 +5,7 @@ import cloudinaryUpload from '../utils/cloudinary.js'
 import { ApiResponse } from '../utils/apiResponse.js'
 import jwt from 'jsonwebtoken'
 import mongoose from "mongoose";
+import { attachPlaybackUrlsToList } from "../utils/videoPlayback.js";
 
 const buildCookieOptions = () => ({
     httpOnly: true,
@@ -459,7 +460,10 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                             "owner.avatar": 1,
                             "owner.userName": 1,
                             title: 1,
-                            description: 1
+                            description: 1,
+                            thumbnail: 1,
+                            videoFile: 1,
+                            hlsUrl: 1
                         }
                     },
 
@@ -482,7 +486,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                user[0].watchHistory,
+                attachPlaybackUrlsToList(user[0]?.watchHistory || [], req),
                 "Watch History fetched Succesfully"
             )
         )

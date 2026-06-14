@@ -42,6 +42,14 @@ const videoSchema =  new Schema({
     thumbnailCloudinaryId:{
         type:String,
         required:true
+    },
+    hlsUrl:{
+        type:String,
+        default:null
+    },
+    hlsPublicId:{
+        type:String,
+        default:null
     }
 },{timestamps:true})
 

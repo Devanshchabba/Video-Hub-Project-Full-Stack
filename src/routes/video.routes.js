@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {uploadVideo ,getVideoId,deleteVideo,updateVideo,toggleVideoPublishStatus,getAllVideos,getChannelAllVideos} from '../controllers/video.controller.js'
+import { uploadVideo, getVideoId, streamVideo, deleteVideo, updateVideo, toggleVideoPublishStatus, getAllVideos, getChannelAllVideos } from '../controllers/video.controller.js'
 import {upload} from '../middlewares/multer.middleWare.js'
 import { jwtVerify } from "../middlewares/auth.middleWare.js";
 const router = Router()
@@ -10,6 +10,7 @@ router.route('/upload').post(jwtVerify,
         { name: "thumbnail", maxCount:1}
     ]), uploadVideo)
 router.route('/video/:videoId').get(jwtVerify,getVideoId)
+router.use('/video/:videoId/stream', streamVideo)
 router.route('/delete-video/:videoId').delete(jwtVerify,deleteVideo)
 router.route('/update-video/:videoId').patch(jwtVerify,
     upload.single("thumbnail"),updateVideo

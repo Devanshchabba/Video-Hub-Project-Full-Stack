@@ -1,4 +1,4 @@
-import multer from  'multer'
+import multer from 'multer'
 
 // Configure storage
 const storage = multer.diskStorage({
@@ -10,8 +10,8 @@ const storage = multer.diskStorage({
     }
 });
 
-export const upload = multer({ 
+export const upload = multer({
     storage,
-    limits: { fileSize: 10 * 1024 * 1024 }
- })
+    limits: { fileSize: 1024 * 1024 * 1024 * 1024 } // 1 GB max file size for HD videos
+})
 

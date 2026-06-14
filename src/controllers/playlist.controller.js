@@ -4,6 +4,20 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import Playlist from "../models/playlist.model.js";
 import Video from '../models/video.model.js'
 import mongoose from "mongoose";
+import { attachPlaybackUrlsToList } from "../utils/videoPlayback.js";
+
+const serializePlaylist = (playlist, req) => {
+    if (!playlist) {
+        return playlist;
+    }
+
+    const plainPlaylist = typeof playlist.toObject === 'function' ? playlist.toObject() : { ...playlist };
+
+    return {
+        ...plainPlaylist,
+        videos: attachPlaybackUrlsToList(plainPlaylist.videos, req),
+    };
+}
 const createPlaylist = asyncHandler(async (req, res) => {
     const { name, description } = req.body
 
@@ -54,12 +68,14 @@ const addvideoToPlaylist = asyncHandler(async (req, res) => {
     }
     playlist.videos.push(videoId)
     await playlist.save({ validateBefore: false })
+    const updatedPlaylist = await Playlist.findById(playlist._id).populate("videos")
+
     return res
         .status(200)
         .json(
             new ApiResponse(
                 200,
-                playlist,
+                serializePlaylist(updatedPlaylist, req),
                 "Video added to playlist Successfully"
             )
         )
@@ -83,7 +99,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Video not found in this playlist")
     }
     await Playlist.updateOne(
-        { _id: userId },
+        { _id: playlistId },
         { $pull: { videos: videoId } }
     );
 
@@ -94,7 +110,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                updatePlaylist,
+                serializePlaylist(updatedPlaylist, req),
                 "Video removed Successfully from playlist"
             )
         )
@@ -115,7 +131,7 @@ const getPlaylistId = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                playlist
+                serializePlaylist(playlist, req)
             )
         )
 })
