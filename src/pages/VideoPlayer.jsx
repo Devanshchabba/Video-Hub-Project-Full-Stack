@@ -19,8 +19,6 @@ function VideoPlayer() {
 
   const navigate = useNavigate()
   const { handleSubmit, register, reset } = useForm()
-
-  const [url, setUrl] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [video, setVideo] = useState({})
@@ -48,10 +46,10 @@ function VideoPlayer() {
     setLoading(true);
     try {
       const res = await videoService.getVideo(video_id)
-      const videoData = res?.data?.data;
+      const videoData = res && typeof res === "object" ? res : {};
       setVideo(videoData && typeof videoData === "object" ? videoData : {})
       setOwner(videoData?.owner && typeof videoData.owner === "object" ? videoData.owner : {})
-      // console.log("videoFile", res.data.data.videoFile)
+      // console.log("videoFile--->", res)
     } catch (error) {
       console.error("Error fetching video: ", error)
       setError(getErrorMessage(error, "Error in fetching video."))
@@ -76,20 +74,6 @@ function VideoPlayer() {
     }
   }
 
-  const addCloudinaryTransform = (url, transform = "f_mp4") => {
-    if (!url || typeof url !== "string") {
-      setUrl("");
-      return "";
-    }
-    if (!url.includes("/upload/")) {
-      setUrl(url);
-      return url;
-    }
-    const optimized = url.replace("/upload/", `/upload/${transform}/`);
-    // console.log("This is optized URl ---> ",optimized)
-    setUrl(optimized)
-    return optimized;
-  }
   const [isSubscribed, setIsSubscribed] = useState(null);
   const [toggleSubscribe, setToggleSubscribe] = useState(isSubscribed)
 
@@ -294,16 +278,9 @@ function VideoPlayer() {
 
 
   useEffect(() => {
-    if (video_id) {
-      handleVideo(video_id);
-      handleComments();
-    }
+    handleVideo(video_id);
+    handleComments();
   }, [video_id])
-
-  // set URL when video file changes
-  useEffect(() => {
-    if (video?.videoFile) addCloudinaryTransform(video.videoFile)
-  }, [video.videoFile])
 
   useEffect(() => {
     if (owner._id) {
@@ -336,6 +313,66 @@ function VideoPlayer() {
   const videoTitle = toText(video?.title, "");
   const videoDescription = toText(video?.description, "");
   const ownerName = toText(owner?.fullName, "");
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+  const isHlsUrl = (value) =>
+    typeof value === "string" &&
+    (value.includes(".m3u8") || value.includes("/stream"));
+
+  const shouldSendCredentials = (value) => {
+    if (typeof value !== "string" || !value.trim()) return false;
+
+    try {
+      const apiOrigin = new URL(apiBaseUrl, window.location.origin).origin;
+      const sourceOrigin = new URL(value, window.location.origin).origin;
+      return apiOrigin === sourceOrigin;
+    } catch {
+      return false;
+    }
+  };
+
+  const getPlayerSource = () => {
+    const explicitStreamUrl =
+      video?.hlsUrl ||
+      video?.streamUrl ||
+      video?.manifestUrl ||
+      video?.playbackUrl;
+
+    if (isHlsUrl(explicitStreamUrl)) {
+      return {
+        src: explicitStreamUrl,
+        isHls: true,
+        type: "application/x-mpegURL",
+        withCredentials: shouldSendCredentials(explicitStreamUrl),
+      };
+    }
+
+    if (isHlsUrl(video?.videoFile)) {
+      return {
+        src: video.videoFile,
+        isHls: true,
+        type: "application/x-mpegURL",
+        withCredentials: shouldSendCredentials(video.videoFile),
+      };
+    }
+
+    if (video_id) {
+      const fallbackStreamUrl = `${apiBaseUrl}/videos/video/${video_id}/stream`;
+      return {
+        src: fallbackStreamUrl,
+        isHls: true,
+        type: "application/x-mpegURL",
+        withCredentials: true,
+      };
+    }
+
+    return {
+      src: video?.videoFile || "",
+      isHls: false,
+      type: "video/mp4",
+      withCredentials: shouldSendCredentials(video?.videoFile || ""),
+    };
+  };
 
 
   // useEffect(() => {
@@ -346,6 +383,12 @@ function VideoPlayer() {
   // useEffect(() => {
   //   console.log('player URL:', url);
   // }, [url]);
+
+
+  const [showFullDescription, setShowFullDescription] = useState(false);
+
+  const playerSource = getPlayerSource();
+  console.log("Player source --->", playerSource);
 
 
   return (
@@ -373,7 +416,7 @@ function VideoPlayer() {
             <div className="h-full w-full">
               <Player
                 className="w-full h-full"
-                src={url}
+                src={playerSource}
               />
             </div>
           </div>
@@ -448,16 +491,12 @@ function VideoPlayer() {
 
           {/* 4. Description Box */}
           <div className="mt-4 rounded-lg bg-gray-100 p-4">
-            <p className="text-sm font-medium text-gray-800">
-              {videoDescription}
-            </p>
-            <p className="mt-2 text-sm text-gray-700">
-              Here is the main description of the video. It can contain links, hashtags,
-              and other important information. It might be a few lines long by default.
-            </p>
-            <button className="mt-2 text-sm font-semibold text-gray-800 hover:text-black">
-              ...more
-            </button>
+            {videoDescription.length > 150 ? videoDescription.substring(0, 150) : videoDescription}
+            {videoDescription.length > 150 && !showFullDescription && (
+              <span onClick={() => setShowFullDescription(!showFullDescription)} className="text-blue-500 hover:text-blue-400 cursor-pointer ml-1">...Read more</span>
+            )}
+            {showFullDescription && videoDescription.length > 150 && (<span className="text-gray-300 text-sm whitespace-pre-wrap">{videoDescription.substring(150)}</span>)}
+            {showFullDescription && videoDescription.length > 150 && (<span onClick={() => setShowFullDescription(!showFullDescription)} className="text-blue-500 hover:text-blue-400 cursor-pointer ml-1"> Show less</span>)}
           </div>
 
           {/* 5. Comments Section */}
@@ -518,7 +557,7 @@ function VideoPlayer() {
                   <div className="flex-1 relative">
                     <div className="flex items-baseline space-x-2">
                       <a href={`/userChannel/${comment.user?.userName}`} className="text-sm font-semibold text-gray-800 dark:text-gray-300">{toText(comment.user?.fullName, "")}</a>
-                      
+
                       <span className="text-xs text-gray-500">2 days ago</span>
                     </div>
                     <div className='absolute right-0'><CommentMenu
@@ -657,10 +696,10 @@ function VideoPlayer() {
                       {toText(video.title, "")}
                     </a>
                     <a href={`/channel/${video.owner}`} className="mt-1 block text-xs text-gray-600 hover:text-gray-900">
-                      
+
                     </a>
                     <p className="mt-1 text-xs text-gray-500">
-                      {toText(video.views, 0)} views &bull; {video.createdAt ? formatDistanceToNow(new Date(video.createdAt)) + ' ago' : ''} 
+                      {toText(video.views, 0)} views &bull; {video.createdAt ? formatDistanceToNow(new Date(video.createdAt)) + ' ago' : ''}
                     </p>
                   </div>
                 </div>

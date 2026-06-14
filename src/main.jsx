@@ -71,6 +71,10 @@ const router = createBrowserRouter([
         element: <UploadVideo />
       },
       {
+        path: '/upload-video/:videoId',
+        element: <UploadVideo />
+      },
+      {
         path: '/userChannel/:userName',
         element: <UserProfile />
       },

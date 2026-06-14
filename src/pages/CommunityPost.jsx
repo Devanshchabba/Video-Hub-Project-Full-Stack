@@ -37,10 +37,10 @@ const CommentIcon = () => (
 );
 // --- Components ---
 
-const PostHeader = ({ channelName, timeAgo, edited }) => (
+const PostHeader = ({ channelName, timeAgo, edited, avatar }) => (
     <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-2">
-            <img className="w-10 h-10 rounded-full" src="https://placehold.co/40x40/3B82F6/FFFFFF?text=BS" alt="Channel Avatar" />
+            <img className="w-10 h-10 rounded-full" src={avatar ? avatar: "https://chatgpt.com/s/m_6a13539979908191976b28a171d08eb3"} alt="Channel Avatar" />
             <div>
                 <span className="text-white font-semibold text-sm">{channelName}</span>
                 <p className="text-gray-400 text-xs">
@@ -136,16 +136,18 @@ const CommunityPostCard = ({ post }) => {
     const handleNextImage = () => {
         setCurrentImageIndex((index) => (index + 1) % postImages.length);
     };
-
+    const [isReadMore, setIsReadMore] = useState(false);
     return (
         <div className="bg-gray-900 p-4 rounded-lg shadow-md border border-gray-800">
-            <PostHeader channelName={authorName} timeAgo={timeAgo} edited={post.edited} />
+            <PostHeader channelName={authorName} timeAgo={timeAgo} edited={post.edited} avatar={post.owner?.avatar || "https://placehold.co/40x40/3B82F6/FFFFFF?text=BS"} />
 
             <p className="text-gray-300 text-sm whitespace-pre-wrap">
-                {textContent.length > 150 ? textContent.substring(0, 150) + "..." : textContent}
-                {textContent.length > 150 && (
-                    <span className="text-blue-500 hover:text-blue-400 cursor-pointer ml-1">Read more</span>
+                {textContent.length > 150  ? textContent.substring(0, 150): textContent}
+                {textContent.length > 150 && !isReadMore && (
+                    <span onClick={() => setIsReadMore(!isReadMore)} className="text-blue-500 hover:text-blue-400 cursor-pointer ml-1">...Read more</span>
                 )}
+                {isReadMore && textContent.length > 150 && (<span className="text-gray-300 text-sm whitespace-pre-wrap">{textContent.substring(150)}</span>)}
+                {isReadMore && textContent.length > 150 && (<span onClick={() => setIsReadMore(!isReadMore)} className="text-blue-500 hover:text-blue-400 cursor-pointer ml-1"> Show less</span>)}
             </p>
 
             {postImages.length > 0 && (

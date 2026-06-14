@@ -48,6 +48,7 @@ function NavBar() {
         const response = await authService.getUser()
         if (response) {
           const newUrl = response.avatar
+          console.log("Fetched user Profile data:", response)
           setUser(response);
           localStorage.setItem('profilePicUrl', newUrl)
           setUserPic(newUrl)
@@ -75,17 +76,6 @@ function NavBar() {
     }, [isLoggedIn])
 
     const { theme, toggleTheme } = useTheme();
-
-    // const onLogoutClick = async () => {
-    //   setError(null);
-    //   try {
-    //     await handleLogout();
-    //     setUser(null);
-    //     onClose();
-    //   } catch (err) {
-    //     setError({ message: 'Failed to logout.' });
-    //   }
-    // };
 
     const ActionButton = ({ icon, text, onClick }) => (
       <button
@@ -118,11 +108,13 @@ function NavBar() {
       <div className="w-full m-20  mt-0  ml-0 max-w-sm rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-700 dark:text-white">
         {isLoggedIn ? (
           <div className="flex items-center space-x-4 pb-4">
-            <img src={user?.avatar} alt="User Avatar" className="h-12 w-12 rounded-full" />
-            <div>
+            <a href={`/userChannel/${user?.userName}`}>
+              <img src={user?.avatar} alt="User Avatar" className="h-21 w-17 rounded-full" />
+            </a>
+            <a href={`/userChannel/${user?.userName}`} className="hover:underline">
               <p className="font-bold text-gray-900 dark:text-gray-200">{user?.userName}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{user?.email}</p>
-            </div>
+            </a>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{user?.email}</p>
           </div>
         ) : (
           <h2 className="pb-4 text-center text-2xl font-bold text-gray-900 dark:text-white">
@@ -245,9 +237,9 @@ function NavBar() {
     if (query) {
       fetchVideos();
     }
-    // const delayDebounce = setTimeout(videos, 300);
+    const delayDebounce = setTimeout(videos, 300);
 
-    // return () => clearTimeout(delayDebounce);
+    return () => clearTimeout(delayDebounce);
   }, [query]);
 
   return (
@@ -385,18 +377,6 @@ function NavBar() {
             <span className="ml-3">Home</span>
           </NavLink>
           <NavLink
-            to="/subscriptions"
-            className={({ isActive }) =>
-              `flex items-center rounded-lg p-2 text-base font-normal ${isActive
-                ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white'
-                : 'text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
-              }`
-            }
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-6 w-6"><path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0111.186 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12.75h10.5" /></svg>
-            <span className="ml-3">Subscriptions</span>
-          </NavLink>
-          <NavLink
             to="/community"
             className={({ isActive }) =>
               `flex items-center rounded-lg p-2 text-base font-normal ${isActive
@@ -419,6 +399,18 @@ function NavBar() {
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-6 w-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125z" /></svg>
             <span className="ml-3">Playlists</span>
+          </NavLink>
+          <NavLink
+            to="/subscriptions"
+            className={({ isActive }) =>
+              `flex items-center rounded-lg p-2 text-base font-normal ${isActive
+                ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white'
+                : 'text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
+              }`
+            }
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-6 w-6"><path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0111.186 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12.75h10.5" /></svg>
+            <span className="ml-3">Subscriptions</span>
           </NavLink>
         </nav>
 

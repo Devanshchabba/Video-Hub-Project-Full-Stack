@@ -48,8 +48,10 @@ export class VideoService {
     }
     async getVideo(videoId) {
         try {
-            const response = await axios.get(`${server}video/${videoId}`)
-            return response
+            const response = await axios.get(`${server}video/${videoId}`, { withCredentials: true })
+            console.log("Response from getVideo --->", response.data.data);
+            return response.data.data;
+
         } catch (error) {
             console.error("Error in fetching video", error)
             throw new Error(getErrorMessage(error, "Error fetching video."));
@@ -58,7 +60,7 @@ export class VideoService {
     async handleUploadVideo(opts) {
         try {
             const response = await axios.post(`${server}upload`, opts)
-            return response.data
+            return response.data.data;
         } catch (error) {
             console.error("Error in uploading video:", error)
             throw new Error(getErrorMessage(error, "Error uploading video."));
@@ -67,9 +69,27 @@ export class VideoService {
     async getChannelVideos(channelId) {
         try {
             const res = await axios.get(`${server}get-channel-videos/${channelId}`, { withCredentials: true })
-            return res.data.data
+            return res.data.data;
         } catch (error) {
             console.error("Error in fetching channel videos", error)
+        }
+    }
+    async deleteVideo(videoId) {
+        try {
+            const res = await axios.delete(`${server}delete-video/${videoId}`, { withCredentials: true });
+            return res.data.data;
+        } catch (error) {
+            console.error("Error deleting video", error);
+            throw new Error(getErrorMessage(error, "Error deleting video."));
+        }
+    }
+    async updateVideo(videoId, updateData) {
+        try {
+            const res = await axios.patch(`${server}update-video/${videoId}`, updateData, { withCredentials: true });
+            return res.data.data;
+        } catch (error) {
+            console.error("Error updating video", error);
+            throw new Error(getErrorMessage(error, "Error updating video."));
         }
     }
     async toggleLike(_id) {
